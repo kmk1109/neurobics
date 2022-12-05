@@ -7,7 +7,7 @@ actions = ['paper']
 seq_length = 30
 secs_for_action = 30
 
-exercise = 'exer3'
+exercise = 'test'
 # MediaPipe hands model
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
@@ -49,7 +49,7 @@ while cap.isOpened():
                 for res in result.multi_hand_landmarks:
                     joint = np.zeros((21,4))
                     for j, lm in enumerate(res.landmark):
-                        joint[j] = [lm.x, lm.y, lm.z, lm.visibility]
+                        joint[j] = [lm.x, lm.y, lm.z, lm.visibility] # float64 data
 
                     # Compute angles between joints
                     v1 = joint[[0,1,2,3,0,5,6,7,0,9,10,11,0,13,14,15,0,17,18,19], :3] # Parent joint
