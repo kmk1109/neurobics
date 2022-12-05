@@ -13,6 +13,7 @@ app = flask.Flask(__name__)
 app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_MP'] = 'mpdata'
 app.config['MYSQL_DATABASE_ANSWER'] = 'answer'
+app.config['MYSQL_DATABASE_RESULT'] = 'result' #only show correct/wrong, result is detiermied by result of mpdata and answer
 app.secret_key = "NEUROBICS"
 mysql.init_app(app)
 
