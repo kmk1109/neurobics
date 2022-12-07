@@ -4,10 +4,10 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 
-actions = ['thumb','paper']
+actions = ['five','four','three','two','one']
 seq_length = 30
-exer = 'exer3'
-model = load_model(f'models/{exer}/classifier_acc.h5')
+exer = 'exer2'
+model = load_model(f'models/{exer}/classifier_acc_raw.h5')
 
 # MediaPipe hands model
 mp_hands = mp.solutions.hands
@@ -25,7 +25,7 @@ action_seq = []
 while cap.isOpened():
     ret, img = cap.read()
     img0 = img.copy()
-    
+    data = []
     #img = cv2.flip(img, 1)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     result = hands.process(img)
@@ -33,6 +33,7 @@ while cap.isOpened():
 
     if result.multi_hand_landmarks is not None:
         for res in result.multi_hand_landmarks:
+
             joint = np.zeros((21, 4))
             for j, lm in enumerate(res.landmark):
                 joint[j] = [lm.x, lm.y, lm.z, lm.visibility]
@@ -50,18 +51,23 @@ while cap.isOpened():
                 v[[1,2,3,5,6,7,9,10,11,13,14,15,17,18,19],:])) # [15,]
 
             angle = np.degrees(angle) # Convert radian to degree
+            angle = np.array([angle], dtype=np.float32)
 
-            d = np.concatenate([joint.flatten(), angle])
+            d = np.concatenate([joint.flatten(), angle.flatten()])
 
+            #data.append(d)
             seq.append(d)
 
             mp_drawing.draw_landmarks(img, res, mp_hands.HAND_CONNECTIONS)
 
-            if len(seq) < seq_length:
-                continue
-
-            input_data = np.expand_dims(np.array(seq[-seq_length:], dtype=np.float32), axis=0)
-
+            # if len(seq) < seq_length:
+            #     continue
+            data = np.array(d)
+            print("data shape : ", data.shape)
+            input_data = np.expand_dims(np.array(seq[0], dtype=np.float32), axis=0)
+            input_data2 = data
+            print("input data shape: ", input_data.shape)
+            print("input data 2 shape : ", input_data2.shape)
             #input_data = d.astype(np.float32)
             #print(input_data.shape)
             y_pred = model.predict(input_data).squeeze()
@@ -69,19 +75,19 @@ while cap.isOpened():
             i_pred = int(np.argmax(y_pred))
             conf = y_pred[i_pred]
 
-            if conf < 0.8:
+            if conf < 0.5:
                 continue
 
             action = actions[i_pred]
             action_seq.append(action)
 
-            if len(action_seq) < 3:
-                continue
+            # if len(action_seq) < 3:
+            #     continue
 
             this_action = '?'
-            if action_seq[-1] == action_seq[-2] == action_seq[-3]:
-                this_action = action
-            #this_action = action
+            # if action_seq[-1] == action_seq[-2] == action_seq[-3]:
+            #     this_action = action
+            this_action = action
 
             cv2.putText(img, f'{this_action.upper()}', org=(int(res.landmark[0].x * img.shape[1]), int(res.landmark[0].y * img.shape[0] + 20)), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(255, 255, 255), thickness=2)
 
