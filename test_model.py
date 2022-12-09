@@ -4,10 +4,10 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 
-actions = ['thumb','paper']
+actions = ['five','four','three','two','one']
 seq_length = 30
-exer = 'exer3'
-model = load_model(f'models/{exer}/classifier_acc.h5')
+exer = 'exer2'
+model = load_model(f'models/{exer}/classifier_acc_raw.h5')
 
 # MediaPipe hands model
 mp_hands = mp.solutions.hands
@@ -25,7 +25,7 @@ action_seq = []
 while cap.isOpened():
     ret, img = cap.read()
     img0 = img.copy()
-    
+    data = []
     #img = cv2.flip(img, 1)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     result = hands.process(img)
@@ -33,6 +33,7 @@ while cap.isOpened():
 
     if result.multi_hand_landmarks is not None:
         for res in result.multi_hand_landmarks:
+
             joint = np.zeros((21, 4))
             for j, lm in enumerate(res.landmark):
                 joint[j] = [lm.x, lm.y, lm.z, lm.visibility]
@@ -50,9 +51,11 @@ while cap.isOpened():
                 v[[1,2,3,5,6,7,9,10,11,13,14,15,17,18,19],:])) # [15,]
 
             angle = np.degrees(angle) # Convert radian to degree
+            angle = np.array([angle], dtype=np.float32)
 
-            d = np.concatenate([joint.flatten(), angle])
+            d = np.concatenate([joint.flatten(), angle.flatten()])
 
+            #data.append(d)
             seq.append(d)
 
             mp_drawing.draw_landmarks(img, res, mp_hands.HAND_CONNECTIONS)
@@ -69,7 +72,7 @@ while cap.isOpened():
             i_pred = int(np.argmax(y_pred))
             conf = y_pred[i_pred]
 
-            if conf < 0.8:
+            if conf < 0.5:
                 continue
 
             action = actions[i_pred]
