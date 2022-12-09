@@ -15,11 +15,8 @@ model_exer3 = load_model(f'../models/exer3/classifier_acc_raw.h5')
 
 def restruct_npy(_joint):
     joint = _joint
-    print(joint.shape)
-    print(joint)
-
     data = []
-
+    
     # Compute angles between joints
     v1 = joint[[0,1,2,3,0,5,6,7,0,9,10,11,0,13,14,15,0,17,18,19], :3] # Parent joint
     v2 = joint[[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20], :3] # Child joint
@@ -41,8 +38,6 @@ def restruct_npy(_joint):
     data.append(d)
     data = np.array(data)
     input_data = np.expand_dims(np.array(data[0], dtype=np.float32), axis=0)
-    print(input_data.shape)
-    print(input_data)
     return input_data
 
 model_app = flask.Flask(__name__)
@@ -62,9 +57,7 @@ def exer_select_and_play():
             actions = [1,2] # ['thumb','little']
             y_pred = model_exer1.predict(hand_npy).squeeze()
             i_pred = int(np.argmax(y_pred))
-            print('now compare')
             action = actions[i_pred]
-            print(action)
             if action == movement:
                 data = {'answer' : 1}
                 return jsonify(data)
@@ -76,8 +69,7 @@ def exer_select_and_play():
             actions = [1,2] #['thumb','paper']
             y_pred = model_exer2.predict(hand_npy).squeeze()
             i_pred = int(np.argmax(y_pred))
-            action = actions[i_pred]
-            print(action)            
+            action = actions[i_pred]            
             if action == movement:
                 data = {'answer' : 1}
                 return jsonify(data)
@@ -88,16 +80,13 @@ def exer_select_and_play():
             actions = [1,2,3,4,5,6]#['five','four','three','two','one', 'zero']
             y_pred = model_exer3.predict(hand_npy).squeeze()
             i_pred = int(np.argmax(y_pred))
-            action = actions[i_pred]
-            print(action)            
+            action = actions[i_pred]            
             if action == movement:
                 data = {'answer' : 1}
                 return jsonify(data)
             else:
                 data = {'answer' : -1}
                 return jsonify(data)         
-        
-    else:
-        print("is not post")
+            
 if __name__ == '__main__':
     model_app.run(host="127.0.0.1", port=5500, debug=True)
