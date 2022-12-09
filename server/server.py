@@ -34,8 +34,8 @@ def mp_upload():
         json_return = {
             "answer" : result
         }        
-        json_send_2 = json.dumps(json_return)
-        return json_send_2
+        json_send = json.dumps(json_return)
+        return json_send
      
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
