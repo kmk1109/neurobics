@@ -1,11 +1,7 @@
-from flask import Flask, request, redirect, url_for, jsonify
-from flaskext.mysql import MySQL
-from werkzeug.utils import secure_filename
-#from restruct_npy import restruct_npy
+from flask import Flask, request, jsonify
 
 import flask
 import numpy as np
-import json
 
 from tensorflow.keras.models import load_model
 
