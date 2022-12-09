@@ -60,8 +60,8 @@ while cap.isOpened():
             if len(seq) < seq_length:
                 continue
 
-            input_data = np.expand_dims(np.array(seq[-seq_length:], dtype=np.float32), axis=0)
-
+            #input_data = np.expand_dims(np.array(seq[-seq_length:], dtype=np.float32), axis=0)
+            input_data = np.expand_dims(np.array(seq[0], dtype=np.float32), axis=0)
             #input_data = d.astype(np.float32)
             #print(input_data.shape)
             y_pred = model.predict(input_data).squeeze()
@@ -75,13 +75,13 @@ while cap.isOpened():
             action = actions[i_pred]
             action_seq.append(action)
 
-            if len(action_seq) < 3:
-                continue
+            # if len(action_seq) < 3:
+            #     continue
 
             this_action = '?'
-            if action_seq[-1] == action_seq[-2] == action_seq[-3]:
-                this_action = action
-            #this_action = action
+            # if action_seq[-1] == action_seq[-2] == action_seq[-3]:
+            #     this_action = action
+            this_action = action
 
             cv2.putText(img, f'{this_action.upper()}', org=(int(res.landmark[0].x * img.shape[1]), int(res.landmark[0].y * img.shape[0] + 20)), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(255, 255, 255), thickness=2)
 
